@@ -1,14 +1,17 @@
 import openai
+import os
 import streamlit as st
 from streamlit_chat import message
 
 # Setting page title and header
-st.set_page_config(page_title="AVA", page_icon=":robot_face:")
-st.markdown("<h1 style='text-align: center;'>AVA - a totally harmless chatbot 😬</h1>", unsafe_allow_html=True)
+st.set_page_config(page_title="Bain CoolBot", page_icon='🖥️',menu_items=None)
+st.markdown("<h1 style='text-align: center;'>A lightweight chat assistant  🖥️</h1>", unsafe_allow_html=True)
 
 # Set org ID and API key
-openai.organization = "<YOUR_OPENAI_ORG_ID>"
-openai.api_key = "<YOUR_OPENAI_API_KEY>"
+# openai.organization = "<YOUR_OPENAI_ORG_ID>"
+# openai.api_key = "<YOUR_OPENAI_API_KEY>"
+openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.organization = os.getenv("BAIN_ORG_ID")
 
 # Initialise session state variables
 if 'generated' not in st.session_state:
@@ -73,7 +76,6 @@ def generate_response(prompt):
     completion_tokens = completion.usage.completion_tokens
     return response, total_tokens, prompt_tokens, completion_tokens
 
-
 # container for chat history
 response_container = st.container()
 # container for text box
@@ -108,3 +110,12 @@ if st.session_state['generated']:
             st.write(
                 f"Model used: {st.session_state['model_name'][i]}; Number of tokens: {st.session_state['total_tokens'][i]}; Cost: ${st.session_state['cost'][i]:.5f}")
             counter_placeholder.write(f"Total cost of this conversation: ${st.session_state['total_cost']:.5f}")
+
+# remove streamlit icon at bottom of page
+hide_streamlit_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
