@@ -4,7 +4,7 @@ import streamlit as st
 from streamlit_chat import message
 
 # Setting page title and header
-st.set_page_config(page_title="Bain CoolBot", page_icon='🖥️',menu_items=None)
+st.set_page_config(page_title="ChattyBot", page_icon='🖥️',menu_items=None)
 st.markdown("<h1 style='text-align: center;'>A lightweight chat assistant  🖥️</h1>", unsafe_allow_html=True)
 
 # Set org ID and API key
