@@ -2,6 +2,7 @@ import openai
 import os
 import streamlit as st
 from streamlit_chat import message
+from dotenv import load_dotenv
 
 # Setting page title and header
 st.set_page_config(page_title="ChattyBot", page_icon='🖥️',menu_items=None)
@@ -10,8 +11,9 @@ st.markdown("<h1 style='text-align: center;'>Chatty Bot  🖥️</h1>", unsafe_a
 # Set org ID and API key
 # openai.organization = "<YOUR_OPENAI_ORG_ID>"
 # openai.api_key = "<YOUR_OPENAI_API_KEY>"
+load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
-openai.organization = os.getenv("BAIN_ORG_ID")
+openai.organization = os.getenv("OPENAI_ORGANIZATION")
 
 # Initialise session state variables
 if 'generated' not in st.session_state:
