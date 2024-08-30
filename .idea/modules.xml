@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/genai-example-streamlit-chatgpt-ui.iml" filepath="$PROJECT_DIR$/.idea/genai-example-streamlit-chatgpt-ui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/kanagat-chattybot.iml" filepath="$PROJECT_DIR$/.idea/kanagat-chattybot.iml" />
     </modules>
   </component>
 </project>

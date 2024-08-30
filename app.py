@@ -1,21 +1,21 @@
 import openai
 import os
 import streamlit as st
-from streamlit_chat import message
-from dotenv import load_dotenv
 
 # Setting page title and header
-st.set_page_config(page_title="ChattyBot", page_icon='🖥️',menu_items=None)
+st.set_page_config(page_title="ChattyBot", page_icon='🖥️', menu_items=None)
 st.markdown("<h1 style='text-align: center;'>Chatty Bot  🖥️</h1>", unsafe_allow_html=True)
 
-# Set org ID and API key
-# openai.organization = "<YOUR_OPENAI_ORG_ID>"
-# openai.api_key = "<YOUR_OPENAI_API_KEY>"
-load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
-openai.organization = os.getenv("OPENAI_ORGANIZATION")
+# Access OpenAI API key and organization ID from environment variables
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+openai.organization = os.environ.get("OPENAI_ORGANIZATION")
 
-# Initialise session state variables
+# Check if API key is set
+if not openai.api_key:
+    st.error("Error: OPENAI_API_KEY environment variable not set.")
+    st.stop()  # Stop execution if API key is not found
+
+# Initialize session state variables
 if 'generated' not in st.session_state:
     st.session_state['generated'] = []
 if 'past' not in st.session_state:
@@ -33,54 +33,52 @@ if 'total_tokens' not in st.session_state:
 if 'total_cost' not in st.session_state:
     st.session_state['total_cost'] = 0.0
 
-# Sidebar - let user choose model, show total cost of current conversation, and let user clear the current conversation
+# Sidebar
 st.sidebar.title("Sidebar")
-model_name = st.sidebar.radio("Choose a model:", ("GPT-3.5", "GPT-4"))
+model_name = st.sidebar.radio("Choose a model:", ("GPT-3.5-turbo", "GPT-4"))
 counter_placeholder = st.sidebar.empty()
 counter_placeholder.write(f"Total cost of this conversation: ${st.session_state['total_cost']:.5f}")
 clear_button = st.sidebar.button("Clear Conversation", key="clear")
 
 # Map model names to OpenAI model IDs
-if model_name == "GPT-3.5":
+if model_name == "GPT-3.5-turbo":
     model = "gpt-3.5-turbo"
 else:
     model = "gpt-4"
 
-# reset everything
+# Reset session state on clear button click
 if clear_button:
     st.session_state['generated'] = []
     st.session_state['past'] = []
     st.session_state['messages'] = [
         {"role": "system", "content": "You are a helpful assistant."}
     ]
-    st.session_state['number_tokens'] = []
     st.session_state['model_name'] = []
     st.session_state['cost'] = []
     st.session_state['total_cost'] = 0.0
     st.session_state['total_tokens'] = []
     counter_placeholder.write(f"Total cost of this conversation: ${st.session_state['total_cost']:.5f}")
 
-
-# generate a response
+# Generate a response from the OpenAI API
 def generate_response(prompt):
     st.session_state['messages'].append({"role": "user", "content": prompt})
 
-    completion = openai.ChatCompletion.create(
+    completion = openai.chat.completions.create(
         model=model,
         messages=st.session_state['messages']
     )
+
+    # CORRECTED way to access response content
     response = completion.choices[0].message.content
     st.session_state['messages'].append({"role": "assistant", "content": response})
 
-    # print(st.session_state['messages'])
     total_tokens = completion.usage.total_tokens
     prompt_tokens = completion.usage.prompt_tokens
     completion_tokens = completion.usage.completion_tokens
     return response, total_tokens, prompt_tokens, completion_tokens
 
-# container for chat history
+# Containers for chat history and text input
 response_container = st.container()
-# container for text box
 container = st.container()
 
 with container:
@@ -95,25 +93,41 @@ with container:
         st.session_state['model_name'].append(model_name)
         st.session_state['total_tokens'].append(total_tokens)
 
-        # from https://openai.com/pricing#language-models
-        if model_name == "GPT-3.5":
+        # Calculate cost based on the selected model
+        if model_name == "GPT-3.5-turbo":
             cost = total_tokens * 0.002 / 1000
-        else:
+        else:  # GPT-4
             cost = (prompt_tokens * 0.03 + completion_tokens * 0.06) / 1000
 
         st.session_state['cost'].append(cost)
         st.session_state['total_cost'] += cost
 
+# Display chat history with custom styling
 if st.session_state['generated']:
     with response_container:
         for i in range(len(st.session_state['generated'])):
-            message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
-            message(st.session_state["generated"][i], key=str(i))
+            # User message
+            st.markdown(
+                f'<div style="background-color: #e9f5ff; padding: 10px; border-radius: 5px; margin-bottom: 5px; width: fit-content; float: right;">'
+                f'{st.session_state["past"][i]}'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+
+            # Bot message
+            st.markdown(
+                f'<div style="background-color: #f2f2f2; padding: 10px; border-radius: 5px; margin-bottom: 5px; width: fit-content;">'
+                f'{st.session_state["generated"][i]}'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+
             st.write(
-                f"Model used: {st.session_state['model_name'][i]}; Number of tokens: {st.session_state['total_tokens'][i]}; Cost: ${st.session_state['cost'][i]:.5f}")
+                f"Model used: {st.session_state['model_name'][i]}; Number of tokens: {st.session_state['total_tokens'][i]}; Cost: ${st.session_state['cost'][i]:.5f}"
+            )
             counter_placeholder.write(f"Total cost of this conversation: ${st.session_state['total_cost']:.5f}")
 
-# remove streamlit icon at bottom of page
+# Hide Streamlit footer
 hide_streamlit_style = """
             <style>
             #MainMenu {visibility: hidden;}

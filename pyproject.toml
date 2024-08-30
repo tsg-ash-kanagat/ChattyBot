@@ -1,17 +1,16 @@
 [tool.poetry]
-name = "genai-example-streamlit-chatgpt-ui"
+name = "kanagat-chattybot"
 version = "0.1.0"
 description = ""
 authors = ["Ash_K <77124115+tsg-ash-kanagat@users.noreply.github.com>"]
 readme = "README.md"
-packages = [{include = "genai_example_streamlit_chatgpt_ui"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-openai = "^0.27.8"
-streamlit = "^1.25.0"
+openai = "^1.28.1"
+streamlit = "^1.34.0"
+python-dotenv = "^1.0.1"
 streamlit-chat = "^0.1.1"
-python-dotenv = "^1.0.0"
 
 
 [build-system]
