@@ -22,7 +22,7 @@ openai.default_headers=createHeaders(
      provider="openai",
      api_key="YOUR_PORTKEY_API_KEY"
 )
-###########################################################
+############################################################
 
 # Check if API key is set
 if not openai.api_key:
