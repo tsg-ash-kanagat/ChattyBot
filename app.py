@@ -2,6 +2,11 @@ import openai
 import os
 import streamlit as st
 
+#################    ADDED THIS  ############################
+#Need to add this to integrate with portkey's url
+from portkey_ai import PORTKEY_GATEWAY_URL, createHeaders
+############################################################
+
 # Setting page title and header
 st.set_page_config(page_title="ChattyBot", page_icon='🖥️', menu_items=None)
 st.markdown("<h1 style='text-align: center;'>Chatty Bot  🖥️</h1>", unsafe_allow_html=True)
@@ -9,6 +14,15 @@ st.markdown("<h1 style='text-align: center;'>Chatty Bot  🖥️</h1>", unsafe_a
 # Access OpenAI API key and organization ID from environment variables
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 openai.organization = os.environ.get("OPENAI_ORGANIZATION")
+
+#################    ADDED THIS  ############################
+#add these options to your openai calls *PLEASE MAKE SURE YOUR ZSCALER IS TURNED OFF*
+openai.base_url = "https://api.portkey.ai/v1/"
+openai.default_headers=createHeaders(
+     provider="openai",
+     api_key="YOUR_PORTKEY_API_KEY"
+)
+############################################################
 
 # Check if API key is set
 if not openai.api_key:
